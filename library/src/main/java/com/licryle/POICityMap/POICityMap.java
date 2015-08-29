@@ -19,12 +19,6 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-
 import com.licryle.POICityMap.datastructure.City;
 import com.licryle.POICityMap.datastructure.CityList;
 import com.licryle.POICityMap.datastructure.POI;
@@ -33,6 +27,11 @@ import com.licryle.POICityMap.helpers.POICityMapListener;
 import com.licryle.POICityMap.helpers.POIParser;
 import com.licryle.POICityMap.helpers.POIQualifier;
 import com.licryle.POICityMap.helpers.Util;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
@@ -72,6 +71,13 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   public boolean isDownloading() { return _bDownloading; }
   public POIList getPOIList() { return _mPOIList; }
   public CityList getCityList() { return _mCityList; }
+  public City getCurrentCity() {
+    if (getCityList().containsKey(_iCityId)) {
+      return getCityList().get(_iCityId);
+    } else {
+      return null;
+    }
+  }
 
   public void invalidate() {
     _updateMarkers();
