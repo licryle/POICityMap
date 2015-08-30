@@ -9,6 +9,8 @@ import com.licryle.POICityMap.POICityMap;
 import com.licryle.POICityMap.datastructure.POI;
 
 public interface POICityMapListener {
+  void onMapReady(POICityMap mPOICityMap);
+
   void onPOIListDownloadFailure(POICityMap mPOICityMap);
   void onPOIListDownloadSuccess(POICityMap mPOICityMap);
 

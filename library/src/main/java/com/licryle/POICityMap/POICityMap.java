@@ -40,7 +40,6 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
 
 	protected Activity _mContext = null;
 
-  protected boolean	_bModeFindBike = true;
   protected boolean	_bDownloading = false;
 
   protected ArrayList<POICityMapListener> _aListeners;
@@ -65,6 +64,7 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     _mMap = mMap;
     _mMap.setInfoWindowAdapter(this);
     _setupMap();
+    _dispatchOnMapReady();
   }
 
   public boolean isMapLoaded() { return _mMap != null; }
@@ -199,6 +199,12 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
 
   public void registerPOICityMapListener(POICityMapListener mListener) {
     _aListeners.add(mListener);
+  }
+
+  protected void _dispatchOnMapReady() {
+    for (POICityMapListener mListener: _aListeners) {
+      mListener.onMapReady(this);
+    }
   }
 
   protected void _dispatchOnPOIClick(POI mPOI) {
