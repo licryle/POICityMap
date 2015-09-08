@@ -1,7 +1,6 @@
 package com.licryle.POICityMap.datastructure;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -9,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
 @SuppressLint("DefaultLocale")
 public class POI implements Serializable {
@@ -26,7 +26,7 @@ public class POI implements Serializable {
 	// Shallow: only contains dynamic data
   protected boolean _bStaticOnly;
 
-	protected Bundle _mDynamicData;
+	protected HashMap<String, Object> _mDynamicData;
 
 	public POI(City mCity, JSONObject mStation)
 	    throws JSONException {
@@ -41,7 +41,7 @@ public class POI implements Serializable {
 		_dLng = mStation.getJSONObject("position").getDouble("lng");
 
 		_bStaticOnly = false;
-		_mDynamicData = new Bundle();
+		_mDynamicData = new HashMap<>();
 	}
 
 	public POI(POI mOriginal) {
@@ -91,12 +91,12 @@ public class POI implements Serializable {
     _bStaticOnly = true;
   }
 
-  protected void _updateDynamicData(Bundle mDynamicData) {
-		_mDynamicData = mDynamicData;
+  protected void _updateDynamicData(HashMap<String, Object> mDynamicData) {
+		_mDynamicData = new HashMap<String, Object>(mDynamicData);
     _bStaticOnly = mDynamicData == null;
   }
 
-	protected Bundle getDynamicData() {
+	protected HashMap<String, Object> getDynamicData() {
 		return _mDynamicData;
 	}
 }
