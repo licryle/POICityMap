@@ -1,12 +1,17 @@
 package com.licryle.POICityMap;
 
 import android.app.Activity;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,7 +31,6 @@ import com.licryle.POICityMap.datastructure.POIList;
 import com.licryle.POICityMap.helpers.POICityMapListener;
 import com.licryle.POICityMap.helpers.POIParser;
 import com.licryle.POICityMap.helpers.POIQualifier;
-import com.licryle.POICityMap.helpers.Util;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,8 +39,9 @@ import java.util.Map;
 
 
 public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
-    InfoWindowAdapter, OnMapReadyCallback {
+    InfoWindowAdapter, OnMapReadyCallback, ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 	private GoogleMap _mMap;
+  protected GoogleApiClient _mGoogleApiClient = null;
 
 	protected Activity _mContext = null;
 
@@ -57,8 +62,20 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     _mPOIQualifier = mPOIQualifier;
     _mPOIParser = mPOIParser;
     _mContext = mContext;
+
+    buildGoogleApiClient();
+    _mGoogleApiClient.connect();
 	}
 
+  protected synchronized void buildGoogleApiClient() {
+    _mGoogleApiClient = new GoogleApiClient.Builder(_mContext)
+        .addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .addApi(LocationServices.API)
+        .build();
+  }
+
+  /****** Google Play Callbacks ******/
   @Override
   public void onMapReady(GoogleMap mMap) {
     _mMap = mMap;
@@ -66,6 +83,38 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     _setupMap();
     _dispatchOnMapReady();
   }
+
+
+  @Override
+  public void onConnected(Bundle bundle) {
+    LatLng mLastLocation = getLastPosition();
+
+    if (mLastLocation != null) {
+      moveCameraTo(mLastLocation, 13);
+    }
+  }
+
+  @Override
+  public void onConnectionSuspended(int i) {
+
+  }
+
+  @Override
+  public void onConnectionFailed(ConnectionResult connectionResult) {
+
+  }
+
+  public LatLng getLastPosition() {
+    if (! _mGoogleApiClient.isConnected()) {
+      return null;
+    }
+
+    Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
+        _mGoogleApiClient);
+
+    return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
+  }
+
 
   public boolean isMapLoaded() { return _mMap != null; }
   public boolean isDownloading() { return _bDownloading; }
@@ -175,8 +224,6 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     _mMap.setOnMarkerClickListener(this);
     _mMap.setOnMapClickListener(this);
     _mMap.getUiSettings().setMapToolbarEnabled(false);
-
-    moveCameraTo(Util.getLastPosition(_mContext), 13);
 
     return true;
   }
