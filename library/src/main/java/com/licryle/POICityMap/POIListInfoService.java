@@ -11,10 +11,7 @@ import android.util.Log;
 import com.licryle.POICityMap.datastructure.City;
 import com.licryle.POICityMap.datastructure.CityList;
 import com.licryle.POICityMap.datastructure.POIList;
-import com.licryle.POICityMap.helpers.POIParser;
-
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.licryle.POICityMap.helpers.POICityMapParser;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +40,7 @@ public class POIListInfoService extends IntentService {
   protected Hashtable<String, ResultReceiver> _mRequesters;
   protected POIList _mPOIList;
   protected CityList _mCityList;
-  protected POIParser _mPOIParser;
+  protected POICityMapParser _mPOICityMapParser;
 
 
   protected static class _IntentConf {
@@ -105,7 +102,12 @@ public class POIListInfoService extends IntentService {
     try {
       ByteArrayOutputStream mOutput = _downloadData(sUrlCityList);
 
-      _parseCityListData(mOutput);
+      try {
+        _parseCityListData(mOutput);
+      } catch (Exception e) {
+        Log.i("POIListInfoService", "Error in parsing CityList");
+      }
+
       mOutput.close();
     } catch (ConnectException e) {
       e.printStackTrace();
@@ -195,7 +197,8 @@ public class POIListInfoService extends IntentService {
     int iSignal = (_mCityList != null && _mCityList.size() > 0) ?
         SUCCESS_CITYLIST : FAILURE_CITYLIST_GENERIC;
 
-    if (bExpiredCityList) { // Download citylist if they are expired
+    if (bExpiredCityList || _mCityList.size() == 0) {
+      // Download citylist if they are expired
       // Send result to process asking, write after, all in background
       iSignal = _downloadCityList(sCityListUrl);
     }
@@ -262,7 +265,7 @@ public class POIListInfoService extends IntentService {
   public static Intent buildIntent(Context mContext,
                                    ResultReceiver mReceiver,
                                    Object mRequestor,
-                                   POIParser mParser,
+                                   POICityMapParser mParser,
                                    int iDeadLinePOIStatic,
                                    int iDeadLinePOIDynamic,
                                    int iDeadLineCityList,
@@ -310,7 +313,7 @@ public class POIListInfoService extends IntentService {
 
     try {
       Class mClass = Class.forName(sParserClassName);
-      _mPOIParser = (POIParser) mClass.newInstance();
+      _mPOICityMapParser = (POICityMapParser) mClass.newInstance();
     } catch (Exception e) {
       // should not happen since the instanciation should come from an object.
     }
@@ -346,24 +349,16 @@ public class POIListInfoService extends IntentService {
   }
 
   private void _parseCityListData(ByteArrayOutputStream mInput)
-      throws JSONException {
+      throws Exception {
     Log.i("POIListInfoService", "Entering _parseCityListData()");
-    String sInput = new String(mInput.toByteArray());
-    JSONArray mJSon = new JSONArray(sInput);
 
     CityList mNewCityList = new CityList();
-    for (int i=0; i < mJSon.length(); i++) {
-      try {
-        City mCity = new City(mJSon.getJSONObject(i));
-        mNewCityList.put(mCity.getId(), mCity);
-      } catch (Exception e) {
-        Log.i("POIListInfoService", "1 POI rejected, JSON invalid. " +
-            e.getMessage());
-      }
-    }
+    _mPOICityMapParser.parseCityList(mInput, mNewCityList);
+
     mNewCityList.setLastUpdate(Calendar.getInstance().getTime());
 
     _mCityList = mNewCityList;
+
     Log.i("POIListInfoService", "Leaving _parseCityListData()");
   }
 
@@ -373,7 +368,7 @@ public class POIListInfoService extends IntentService {
       throws Exception {
     Log.i("POIListInfoService", "Entering _parsePOIListFullData()");
 
-    _mPOIParser.parsePOIListFullData(mInput, mOutput, mCity);
+    _mPOICityMapParser.parsePOIListFullData(mInput, mOutput, mCity);
     mOutput.setLastUpdate(Calendar.getInstance().getTime());
 
     Log.i("POIListInfoService", "Leaving _parsePOIListFullData()");
@@ -385,7 +380,7 @@ public class POIListInfoService extends IntentService {
       throws Exception {
     Log.i("POIListInfoService", "Entering _parsePOIListDynamicData()");
 
-    _mPOIParser.parsePOIListDynamicData(mInput, mOutput, mCity);
+    _mPOICityMapParser.parsePOIListDynamicData(mInput, mOutput, mCity);
     mOutput.setLastUpdate(Calendar.getInstance().getTime());
 
     Log.i("POIListInfoService", "Leaving _parsePOIListDynamicData()");

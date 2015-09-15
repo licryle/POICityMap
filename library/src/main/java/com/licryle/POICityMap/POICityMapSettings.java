@@ -16,7 +16,7 @@ public class POICityMapSettings implements Serializable {
   protected int _iDynamicDeadline = 3;
   protected int _iCityListDeadline = 10;
 
-  protected String _sURLBase = "http://veliby.berliat.fr/v3/";
+  protected String _sURLBase = "";
   protected String _sUrlCityList = "";
   protected String _sUrlPOIList = "?c=%d&f=%d";
 

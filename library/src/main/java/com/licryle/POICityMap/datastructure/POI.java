@@ -31,14 +31,13 @@ public class POI implements Serializable {
 	public POI(City mCity, JSONObject mStation)
 	    throws JSONException {
     _mCity = mCity;
-		// TODO restore this list _iId = mStation.getInt("id");
-		_iId = mStation.getInt("number");
+		_iId = mStation.getInt("poiId");
 
 		_sName = mStation.getString("name");
 		_sAddress = mStation.getString("address");
 
-		_dLat = mStation.getJSONObject("position").getDouble("lat");
-		_dLng = mStation.getJSONObject("position").getDouble("lng");
+		_dLat = mStation.getDouble("latitude");
+		_dLng = mStation.getDouble("longitude");
 
 		_bStaticOnly = false;
 		_mDynamicData = new HashMap<>();

@@ -30,12 +30,12 @@ public class City implements Serializable {
 
   public City(JSONObject mContract)
       throws JSONException {
-    _iId = mContract.getInt("id");
-    _sInternalName = mContract.getString("name");
-    _sDisplayName = mContract.getString("city");
+    _iId = mContract.getInt("cityId");
+    _sInternalName = mContract.getString("internalName");
+    _sDisplayName = mContract.getString("displayName");
 
-    _dLat = mContract.getJSONObject("position").getDouble("lat");
-    _dLng = mContract.getJSONObject("position").getDouble("lng");
+    _dLat = mContract.getDouble("latitude");
+    _dLng = mContract.getDouble("longitude");
 
     _iZoom = mContract.getInt("zoom");
   }

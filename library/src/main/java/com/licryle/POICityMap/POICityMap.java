@@ -29,7 +29,7 @@ import com.licryle.POICityMap.datastructure.CityList;
 import com.licryle.POICityMap.datastructure.POI;
 import com.licryle.POICityMap.datastructure.POIList;
 import com.licryle.POICityMap.helpers.POICityMapListener;
-import com.licryle.POICityMap.helpers.POIParser;
+import com.licryle.POICityMap.helpers.POICityMapParser;
 import com.licryle.POICityMap.helpers.POIQualifier;
 
 import java.io.Serializable;
@@ -51,16 +51,16 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   protected POIList _mPOIList = null;
   protected CityList _mCityList = new CityList();
   protected POIQualifier _mPOIQualifier = null;
-  protected POIParser _mPOIParser = null;
+  protected POICityMapParser _mPOICityMapParser = null;
   protected POICityMapSettings _mSettings = null;
   protected int _iCityId = 0;
 
 	public POICityMap(Activity mContext, POICityMapSettings mSettings,
-                    POIQualifier mPOIQualifier, POIParser mPOIParser) {
+                    POIQualifier mPOIQualifier, POICityMapParser mPOICityMapParser) {
     _aListeners = new ArrayList<POICityMapListener>();
     _mSettings = mSettings;
     _mPOIQualifier = mPOIQualifier;
-    _mPOIParser = mPOIParser;
+    _mPOICityMapParser = mPOICityMapParser;
     _mContext = mContext;
 
     buildGoogleApiClient();
@@ -148,7 +148,7 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
         _mContext,
         new _DownloadPOIListReceiver(new Handler()),
         this,
-        _mPOIParser,
+        _mPOICityMapParser,
         _mSettings.getStaticDeadLine(),
         _mSettings.getDynamicDeadLine(),
         _mSettings.getCityListDeadLine(),
