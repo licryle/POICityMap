@@ -31,7 +31,7 @@ public class POI implements Serializable {
 	public POI(City mCity, JSONObject mStation)
 	    throws JSONException {
     _mCity = mCity;
-		_iId = mStation.getInt("poiId");
+		_iId = mStation.getInt("poiid");
 
 		_sName = mStation.getString("name");
 		_sAddress = mStation.getString("address");
