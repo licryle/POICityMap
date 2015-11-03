@@ -27,13 +27,19 @@ public class POICityMapSettings implements Serializable {
   }
 
   public int getStaticDeadLine() { return _iStaticDeadline; }
-  public void setStaticDeadLine(int iStaticDeadline) { _iStaticDeadline = iStaticDeadline; }
+  public void setStaticDeadLine(int iStaticDeadline) {
+    _iStaticDeadline = iStaticDeadline;
+  }
 
   public int getDynamicDeadLine() { return _iDynamicDeadline; }
-  public void setDynamicDeadLine(int iDynamicDeadline) { _iDynamicDeadline = iDynamicDeadline; }
+  public void setDynamicDeadLine(int iDynamicDeadline) {
+    _iDynamicDeadline = iDynamicDeadline;
+  }
 
   public int getCityListDeadLine() { return _iCityListDeadline; }
-  public void setCityListDeadLine(int iCityListDeadline) { _iCityListDeadline = iCityListDeadline; }
+  public void setCityListDeadLine(int iCityListDeadline) {
+    _iCityListDeadline = iCityListDeadline;
+  }
 
 
   public void setURLBase(String sURL) { _sURLBase = sURL; }

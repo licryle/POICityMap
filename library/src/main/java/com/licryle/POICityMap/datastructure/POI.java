@@ -72,14 +72,6 @@ public class POI implements Serializable {
 	public City getCity() { return _mCity; }
 	public int getId() { return _iId; }
 	public String getName() { return _sName; }
-	public String getFriendlyName() {
-	  String sTitle = this.getName();
-
-	  sTitle = sTitle.replaceAll("[0-9]+ - (.*)", "$1").toLowerCase();
-    sTitle = Character.toUpperCase(sTitle.charAt(0)) + sTitle.substring(1);
-
-    return sTitle;
-	}
 	public String getAddress() { return _sAddress; }
 	public LatLng getPosition() { return new LatLng(_dLat, _dLng); }
 

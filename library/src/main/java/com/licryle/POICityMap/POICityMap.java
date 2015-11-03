@@ -39,7 +39,8 @@ import java.util.Map;
 
 
 public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
-    InfoWindowAdapter, OnMapReadyCallback, ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+    InfoWindowAdapter, OnMapReadyCallback, ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener {
 	private GoogleMap _mMap;
   protected GoogleApiClient _mGoogleApiClient = null;
 
@@ -56,7 +57,8 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   protected int _iCityId = 0;
 
 	public POICityMap(Activity mContext, POICityMapSettings mSettings,
-                    POIQualifier mPOIQualifier, POICityMapParser mPOICityMapParser) {
+                    POIQualifier mPOIQualifier,
+                    POICityMapParser mPOICityMapParser) {
     _aListeners = new ArrayList<POICityMapListener>();
     _mSettings = mSettings;
     _mPOIQualifier = mPOIQualifier;
@@ -111,6 +113,8 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
 
     Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
         _mGoogleApiClient);
+
+    if (mLocation == null) return null;
 
     return new LatLng(mLocation.getLatitude(), mLocation.getLongitude());
   }
@@ -296,10 +300,19 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     }
   }
 
-  protected View _dispatchOnGetInfoContents(Marker mMarker, POI mPOI) {
+  protected View _dispatchOnGetMarkerInfoContents(Marker mMarker, POI mPOI) {
     View mResult = null;
     for (POICityMapListener mListener: _aListeners) {
-      mResult = mListener.onGetInfoContents(mMarker, mPOI);
+      mResult = mListener.onGetMarkerInfoContents(mMarker, mPOI);
+    }
+
+    return mResult;
+  }
+
+  protected View _dispatchOnGetMarkerInfoView(Marker mMarker, POI mPOI) {
+    View mResult = null;
+    for (POICityMapListener mListener: _aListeners) {
+      mResult = mListener.onGetMarkerInfoView(mMarker, mPOI);
     }
 
     return mResult;
@@ -395,11 +408,16 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     String sPOIId = mMarker.getTitle();
     POI mPOI = _mPOIList.get(Integer.valueOf(sPOIId));
 
-    return _dispatchOnGetInfoContents(mMarker, mPOI);
+    return _dispatchOnGetMarkerInfoContents(mMarker, mPOI);
   }
 
   @Override
   public View getInfoWindow(Marker mMarker) {
-    return null;
+    if (_mPOIList == null) return null;
+
+    String sPOIId = mMarker.getTitle();
+    POI mPOI = _mPOIList.get(Integer.valueOf(sPOIId));
+
+    return _dispatchOnGetMarkerInfoView(mMarker, mPOI);
   }
 }

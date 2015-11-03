@@ -20,7 +20,8 @@ public interface POICityMapListener {
   void onPOIClick(POICityMap mPOICityMap, POI mPOI);
   void onMapClick(POICityMap POICityMap, LatLng mLatLng);
 
-  View onGetInfoContents(Marker mMarker, POI mPOI);
+  View onGetMarkerInfoContents(Marker mMarker, POI mPOI);
+  View onGetMarkerInfoView(Marker mMarker, POI mPOI);
 
   void onDirectionsFailed(POICityMap POICityMap);
 }
