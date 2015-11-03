@@ -184,6 +184,12 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     updateCamera(cu);
   }
 
+  public CameraPosition getCameraPosition() {
+    if (!isMapLoaded()) return null;
+
+    return _mMap.getCameraPosition();
+  }
+
   public void updateCamera(CameraUpdate mCameraUpdate) {
     if (!isMapLoaded()) return;
 
