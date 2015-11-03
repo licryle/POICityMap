@@ -42,18 +42,8 @@ public class POIListInfoService extends IntentService {
   protected CityList _mCityList;
   protected POICityMapParser _mPOICityMapParser;
 
-
-  protected static class _IntentConf {
-    public static String sPOIListFile;
-    public static int iDlStatic;
-    public static int iDlDynamic;
-    public static int iDlCityList;
-    public static int iCity;
-    public static String sCityListUrl;
-    public static String sCityListFile;
-    public static String sURLPOIListDynamic;
-    public static String sURLPOIListFull;
-  }
+  protected POICityMapSettings _mSettings;
+  protected int _iCity;
 
   public POIListInfoService() {
     super("POIListInfoService");
@@ -265,32 +255,15 @@ public class POIListInfoService extends IntentService {
   public static Intent buildIntent(Context mContext,
                                    ResultReceiver mReceiver,
                                    Object mRequestor,
+                                   POICityMapSettings mSettings,
                                    POICityMapParser mParser,
-                                   int iDeadLinePOIStatic,
-                                   int iDeadLinePOIDynamic,
-                                   int iDeadLineCityList,
-                                   File mPOIFile,
-                                   File mCityListFile,
-                                   String sPOIListURLStatic,
-                                   String sPOIListURLDynamic,
-                                   String sCityListURL,
                                    int iCityId) {
     Intent mIntent = new Intent(mContext, POIListInfoService.class);
 
     mIntent.putExtra("receiver", (Parcelable) mReceiver);
     mIntent.putExtra("requestor", mRequestor.toString());
+    mIntent.putExtra("settings", mSettings);
     mIntent.putExtra("poi_parser", mParser.getClass().getName());
-
-    mIntent.putExtra("dl_static", iDeadLinePOIStatic);
-    mIntent.putExtra("dl_dynamic", iDeadLinePOIDynamic);
-    mIntent.putExtra("dl_citylist", iDeadLineCityList);
-
-    mIntent.putExtra("POIlist_file", mPOIFile.getAbsolutePath());
-    mIntent.putExtra("citylist_file", mCityListFile.getAbsolutePath());
-
-    mIntent.putExtra("POIlist_url_dynamic", sPOIListURLDynamic);
-    mIntent.putExtra("POIlist_url_full", sPOIListURLStatic);
-    mIntent.putExtra("citylist_url", sCityListURL);
 
     mIntent.putExtra("city_id", iCityId);
 
@@ -298,18 +271,9 @@ public class POIListInfoService extends IntentService {
   }
 
   protected void _parseIntent(Intent mIntent) {
-    _IntentConf.sPOIListFile = mIntent.getStringExtra("POIlist_file");
-    _IntentConf.iDlStatic = mIntent.getIntExtra("dl_static", 1000);
-    _IntentConf.iDlDynamic = mIntent.getIntExtra("dl_dynamic", 1000);
-
-    _IntentConf.iDlCityList = mIntent.getIntExtra("dl_citylist", 1000);
-    _IntentConf.iCity = mIntent.getIntExtra("city_id", 0);
-    _IntentConf.sCityListUrl = mIntent.getStringExtra("citylist_url");
-    _IntentConf.sCityListFile = mIntent.getStringExtra("citylist_file");
-
-    _IntentConf.sURLPOIListDynamic = mIntent.getStringExtra("POIlist_url_dynamic");
-    _IntentConf.sURLPOIListFull = mIntent.getStringExtra("POIlist_url_full");
+    _mSettings = (POICityMapSettings) mIntent.getSerializableExtra("settings");
     String sParserClassName = mIntent.getStringExtra("poi_parser");
+    _iCity = mIntent.getIntExtra("city_id", 0);
 
     try {
       Class mClass = Class.forName(sParserClassName);
@@ -327,18 +291,20 @@ public class POIListInfoService extends IntentService {
 
     _parseIntent(mIntent);
 
-    File mPOIListFile = new File(_IntentConf.sPOIListFile);
-    File mCityListFile = new File(_IntentConf.sCityListFile);
+    File mPOIListFile = _mSettings.getPOIListFile();
+    File mCityListFile = _mSettings.getCityListFile();
 
     _loadCityList(mCityListFile);
-    _loadPOIList(mPOIListFile, _IntentConf.iDlDynamic);
+    _loadPOIList(mPOIListFile, _mSettings.getDynamicDeadLine());
 
-    if (_updateCityList(_IntentConf.iDlCityList, _IntentConf.sCityListUrl))
+    if (_updateCityList(_mSettings.getCityListDeadLine(),
+        _mSettings.getURLCityList()))
       _mCityList.saveToFile(mCityListFile);
 
-    if (_IntentConf.iCity != 0 && _updatePOIList(_IntentConf.iDlStatic,
-        _IntentConf.iDlDynamic, _IntentConf.iCity,
-        _IntentConf.sURLPOIListFull, _IntentConf.sURLPOIListDynamic))
+    if (_iCity != 0 && _updatePOIList(_mSettings.getStaticDeadLine(),
+        _mSettings.getDynamicDeadLine(), _iCity,
+        _mSettings.getURLPOIListFullData(_iCity),
+        _mSettings.getURLPOIListDynamicData(_iCity)))
       _mPOIList.saveToFile(mPOIListFile);
 
     Bundle mBundle = new Bundle();

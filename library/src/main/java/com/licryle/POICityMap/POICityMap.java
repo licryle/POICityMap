@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ResultReceiver;
 import android.util.Log;
 import android.view.View;
 
@@ -30,9 +29,10 @@ import com.licryle.POICityMap.datastructure.POI;
 import com.licryle.POICityMap.datastructure.POIList;
 import com.licryle.POICityMap.helpers.POICityMapListener;
 import com.licryle.POICityMap.helpers.POICityMapParser;
+import com.licryle.POICityMap.helpers.POIListInfoServiceListener;
+import com.licryle.POICityMap.helpers.POIListInfoServiceReceiver;
 import com.licryle.POICityMap.helpers.POIQualifier;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     InfoWindowAdapter, OnMapReadyCallback, ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener {
+    GoogleApiClient.OnConnectionFailedListener, POIListInfoServiceListener {
 	private GoogleMap _mMap;
   protected GoogleApiClient _mGoogleApiClient = null;
 
@@ -150,17 +150,10 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     Log.i("POICityMap", "Starting Intent in downloadMarkers()");
     _mContext.startService(POIListInfoService.buildIntent(
         _mContext,
-        new _DownloadPOIListReceiver(new Handler()),
+        new POIListInfoServiceReceiver(new Handler(), this),
         this,
+        _mSettings,
         _mPOICityMapParser,
-        _mSettings.getStaticDeadLine(),
-        _mSettings.getDynamicDeadLine(),
-        _mSettings.getCityListDeadLine(),
-        _mSettings.getPOIListFile(),
-        _mSettings.getCityListFile(),
-        _mSettings.getURLPOIListFullData(_iCityId),
-        _mSettings.getURLPOIListDynamicData(_iCityId),
-        _mSettings.getURLCityList(),
         _iCityId
     ));
 
@@ -346,67 +339,6 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     );
   }
 
-
-  private class _DownloadPOIListReceiver extends ResultReceiver
-      implements Serializable{
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 5529673172741409950L;
-
-    public _DownloadPOIListReceiver(Handler handler) {
-      super(handler);
-    }
-
-    @Override
-    protected void onReceiveResult(int resultCode, Bundle resultData) {
-      super.onReceiveResult(resultCode, resultData);
-
-      switch (resultCode) {
-        case POIListInfoService.FAILURE_POILIST_CONNECTION:
-        case POIListInfoService.FAILURE_POILIST_GENERIC:
-        case POIListInfoService.FAILURE_POILIST_PARSE:
-        case POIListInfoService.SUCCESS_POILIST:
-          _mPOIList = (POIList) resultData.getSerializable("poilist");
-
-          // we need this to display at least static data
-          if (_mPOIList != null) {
-            _updateMarkers();
-          }
-
-          if (resultCode == POIListInfoService.SUCCESS_POILIST) {
-            Log.i("POICityMap", "onReceiveResult() SUCCESS_POILIST_xxxx");
-            _dispatchOnPOIListDownloadSuccess();
-          } else {
-            Log.i("POICityMap", "onReceiveResult() FAILURE_POILIST_xxxx");
-            _dispatchOnPOIListDownloadFailure();
-          }
-        break;
-
-        case POIListInfoService.FAILURE_CITYLIST_CONNECTION:
-        case POIListInfoService.FAILURE_CITYLIST_GENERIC:
-        case POIListInfoService.FAILURE_CITYLIST_PARSE:
-        case POIListInfoService.SUCCESS_CITYLIST:
-
-          _mCityList = (CityList) resultData.getSerializable("citylist");
-
-          if (resultCode == POIListInfoService.SUCCESS_CITYLIST) {
-            Log.i("POICityMap", "onReceiveResult() SUCCESS_CITYLIST_xxxx");
-            _dispatchOnCityDownloadSuccess();
-          } else {
-            Log.i("POICityMap", "onReceiveResult() FAILURE_CITYLIST_xxxx");
-            _dispatchOnCityDownloadFailure();
-          }
-        break;
-
-        case POIListInfoService.FINISHED:
-          Log.i("POICityMap", "onReceiveResult() FINISHED");
-          _bDownloading = false;
-        break;
-      }
-    }
-  }
-
   @Override
   public View getInfoContents(Marker mMarker) {
     if (_mPOIList == null) return null;
@@ -425,5 +357,45 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     POI mPOI = _mPOIList.get(Integer.valueOf(sPOIId));
 
     return _dispatchOnGetMarkerInfoView(mMarker, mPOI);
+  }
+
+  @Override
+  public void onPOIListDownloadFailure(POIList mPOIList) {
+    _mPOIList = mPOIList;
+
+    // we need this to display at least static data
+    if (_mPOIList != null) {
+      _updateMarkers();
+    }
+    _dispatchOnPOIListDownloadFailure();
+  }
+
+  @Override
+  public void onPOIListDownloadSuccess(POIList mPOIList) {
+    _mPOIList = mPOIList;
+
+    // we need this to display at least static data
+    if (_mPOIList != null) {
+      _updateMarkers();
+    }
+
+    _dispatchOnPOIListDownloadSuccess();
+  }
+
+  @Override
+  public void onCityListDownloadFailure(CityList mCityList) {
+    _mCityList = mCityList;
+    _dispatchOnCityDownloadFailure();
+  }
+
+  @Override
+  public void onCityListDownloadSuccess(CityList mCityList) {
+    _mCityList = mCityList;
+    _dispatchOnCityDownloadSuccess();
+  }
+
+  @Override
+  public void onFinished() {
+    _bDownloading = false;
   }
 }
