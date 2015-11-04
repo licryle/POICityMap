@@ -46,7 +46,7 @@ public class POIListInfoServiceReceiver extends ResultReceiver
         } else {
           Log.i("POIListInfoServiceRecei",
               "onReceiveResult() FAILURE_POILIST_xxxx");
-          _mListener.onPOIListDownloadFailure(mPOIList);
+          _mListener.onPOIListDownloadFailure(mPOIList, resultCode);
         }
         break;
 
@@ -64,7 +64,7 @@ public class POIListInfoServiceReceiver extends ResultReceiver
         } else {
           Log.i("POIListInfoServiceRecei",
               "onReceiveResult() FAILURE_CITYLIST_xxxx");
-          _mListener.onCityListDownloadFailure(mCityList);
+          _mListener.onCityListDownloadFailure(mCityList, resultCode);
         }
         break;
 

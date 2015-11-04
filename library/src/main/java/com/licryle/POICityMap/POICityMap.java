@@ -360,7 +360,7 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   }
 
   @Override
-  public void onPOIListDownloadFailure(POIList mPOIList) {
+  public void onPOIListDownloadFailure(POIList mPOIList, int iResultCode) {
     _mPOIList = mPOIList;
 
     // we need this to display at least static data
@@ -383,7 +383,7 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   }
 
   @Override
-  public void onCityListDownloadFailure(CityList mCityList) {
+  public void onCityListDownloadFailure(CityList mCityList, int iResultCode) {
     _mCityList = mCityList;
     _dispatchOnCityDownloadFailure();
   }
