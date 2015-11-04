@@ -52,7 +52,7 @@ public class POIList extends Hashtable<Integer, POI> {
     }
   }
 
-  public static POIList loadPOIListInfo(File mFile, int iDeadLine) {
+  public static POIList loadFromFile(File mFile, int iDeadLine) {
     POIList mPOIList;
 
     try {

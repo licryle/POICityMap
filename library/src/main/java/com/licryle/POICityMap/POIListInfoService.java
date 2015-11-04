@@ -76,7 +76,7 @@ public class POIListInfoService extends IntentService {
 
   protected void _loadPOIList(File mPOIListFile, int iDlDynamic) {
     if (_mPOIList == null) {
-      _mPOIList = POIList.loadPOIListInfo(mPOIListFile, iDlDynamic);
+      _mPOIList = POIList.loadFromFile(mPOIListFile, iDlDynamic);
     }
   }
 
