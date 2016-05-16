@@ -23,6 +23,8 @@ public class POICityMapSettings implements Serializable {
   protected String _sAppName = "";
 
 
+  protected float _fDefaultZoom = 13;
+
   public POICityMapSettings() {
   }
 
@@ -44,6 +46,9 @@ public class POICityMapSettings implements Serializable {
 
   public void setURLBase(String sURL) { _sURLBase = sURL; }
   public void setAppName(String sAppName) { _sAppName = sAppName; }
+
+  public float getDefaultZoom() { return _fDefaultZoom; }
+  public void setDefaultZoom(float fZoom) { _fDefaultZoom = fZoom; }
 
   @SuppressLint("DefaultLocale")
   public String getURLPOIListDynamicData(int iCityId) {

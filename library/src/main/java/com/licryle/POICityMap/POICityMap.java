@@ -92,7 +92,7 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     LatLng mLastLocation = getLastPosition();
 
     if (mLastLocation != null) {
-      moveCameraTo(mLastLocation, 13);
+      moveCameraTo(mLastLocation, _mSettings.getDefaultZoom());
     }
   }
 
@@ -132,6 +132,8 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     }
   }
 
+  public POICityMapSettings getSettings() { return _mSettings; }
+
   public void invalidate() {
     _updateMarkers();
   }
@@ -168,13 +170,17 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     }
   }
 
-  public void moveCameraTo(LatLng mPosition, int iZoom) {
-    if (mPosition == null) return;
+  public void moveCameraTo(LatLng mPosition, float fZoom) {
+    CameraUpdate mCamUpdate;
 
-    CameraUpdate cu = CameraUpdateFactory.newCameraPosition(
-        new CameraPosition(mPosition, iZoom, 0, 0));
+    if (mPosition == null) {
+      mCamUpdate = CameraUpdateFactory.zoomTo(fZoom);
+    } else {
+      mCamUpdate = CameraUpdateFactory.newCameraPosition(
+          new CameraPosition(mPosition, fZoom, 0, 0));
+    }
 
-    updateCamera(cu);
+    updateCamera(mCamUpdate);
   }
 
   public CameraPosition getCameraPosition() {
