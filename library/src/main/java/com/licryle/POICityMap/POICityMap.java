@@ -1,9 +1,13 @@
 package com.licryle.POICityMap;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -41,6 +45,8 @@ import java.util.Map;
 public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     InfoWindowAdapter, OnMapReadyCallback, ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, POIListInfoServiceListener {
+  public final int PERMISSION_LOCATION_FINE = 5212025;
+
 	private GoogleMap _mMap;
   protected GoogleApiClient _mGoogleApiClient = null;
 
@@ -111,8 +117,13 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
       return null;
     }
 
-    Location mLocation = LocationServices.FusedLocationApi.getLastLocation(
-        _mGoogleApiClient);
+    Location mLocation = null;
+    try {
+      mLocation = LocationServices.FusedLocationApi.getLastLocation(
+          _mGoogleApiClient);
+    } catch (SecurityException mException) {
+
+    }
 
     if (mLocation == null) return null;
 
@@ -229,10 +240,27 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   protected boolean _setupMap() {
     if (!isMapLoaded()) return false;
 
-    _mMap.setMyLocationEnabled(true);
+    // Here, thisActivity is the current activity
+    if (ContextCompat.checkSelfPermission(_mContext,
+        Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED) {
+
+        ActivityCompat.requestPermissions(_mContext,
+            new String[]{Manifest.permission.READ_CONTACTS},
+            PERMISSION_LOCATION_FINE);
+    } else {
+      _mMap.setMyLocationEnabled(_mSettings.getDisplayLocation());
+    }
+
+
     _mMap.setOnMarkerClickListener(this);
     _mMap.setOnMapClickListener(this);
-    _mMap.getUiSettings().setMapToolbarEnabled(false);
+
+    _mMap.getUiSettings().setMapToolbarEnabled(_mSettings.getDisplayToolBar());
+    _mMap.getUiSettings().setCompassEnabled(_mSettings.getDisplayCompass());
+    _mMap.getUiSettings().setZoomControlsEnabled(_mSettings.getDisplayZoom());
+    _mMap.getUiSettings().setIndoorLevelPickerEnabled(
+        _mSettings.getDisplayIndoor());
 
     return true;
   }

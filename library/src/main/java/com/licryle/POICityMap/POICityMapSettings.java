@@ -25,6 +25,12 @@ public class POICityMapSettings implements Serializable {
 
   protected float _fDefaultZoom = 13;
 
+  protected boolean _bDisplayCompass = false;
+  protected boolean _bDisplayLocation = false;
+  protected boolean _bDisplayZoom = false;
+  protected boolean _bDisplayToolBar = false;
+  protected boolean _bDisplayIndoor = false;
+
   public POICityMapSettings() {
   }
 
@@ -80,5 +86,30 @@ public class POICityMapSettings implements Serializable {
 
   public File getCityListFile() {
     return new File(getMapPath().getAbsolutePath() + "/CityList");
+  }
+
+  public boolean getDisplayCompass() { return _bDisplayCompass; }
+  public void setDisplayCompass(boolean bDisplayCompass) {
+    _bDisplayCompass = bDisplayCompass;
+  }
+
+  public boolean getDisplayLocation() { return _bDisplayLocation; }
+  public void setDisplayLocation(boolean bDisplayLocation) {
+    _bDisplayLocation = bDisplayLocation;
+  }
+
+  public boolean getDisplayZoom() { return _bDisplayZoom; }
+  public void setDisplayZoom(boolean bDisplayZoom) {
+    _bDisplayZoom = bDisplayZoom;
+  }
+
+  public boolean getDisplayToolBar() { return _bDisplayToolBar; }
+  public void setDisplayToolBar(boolean mDisplayToolBar) {
+    _bDisplayToolBar = mDisplayToolBar;
+  }
+
+  public boolean getDisplayIndoor() { return _bDisplayIndoor; }
+  public void setDisplayIndoor(boolean mDisplayIndoor) {
+    _bDisplayIndoor = mDisplayIndoor;
   }
 }
