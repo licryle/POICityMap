@@ -45,7 +45,7 @@ import java.util.Map;
 public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     InfoWindowAdapter, OnMapReadyCallback, ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, POIListInfoServiceListener {
-  public final int PERMISSION_LOCATION_FINE = 5212025;
+  public final int PERMISSION_LOCATION_FINE = 51025;
 
 	private GoogleMap _mMap;
   protected GoogleApiClient _mGoogleApiClient = null;
@@ -144,6 +144,10 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   }
 
   public POICityMapSettings getSettings() { return _mSettings; }
+  public void setSettings(POICityMapSettings mSettings) {
+    _mSettings = mSettings;
+    _setupMap();
+  }
 
   public void invalidate() {
     _updateMarkers();

@@ -1,7 +1,6 @@
 package com.licryle.POICityMap;
 
 import android.annotation.SuppressLint;
-import android.os.Environment;
 
 import java.io.File;
 import java.io.Serializable;
@@ -21,6 +20,7 @@ public class POICityMapSettings implements Serializable {
   protected String _sUrlPOIList = "?c=%d&f=%d";
 
   protected String _sAppName = "";
+  protected String _sBasePath = "";
 
 
   protected float _fDefaultZoom = 13;
@@ -52,6 +52,7 @@ public class POICityMapSettings implements Serializable {
 
   public void setURLBase(String sURL) { _sURLBase = sURL; }
   public void setAppName(String sAppName) { _sAppName = sAppName; }
+  public void setCachePath(String sBasePath) { _sBasePath = sBasePath; }
 
   public float getDefaultZoom() { return _fDefaultZoom; }
   public void setDefaultZoom(float fZoom) { _fDefaultZoom = fZoom; }
@@ -73,7 +74,7 @@ public class POICityMapSettings implements Serializable {
   protected File getMapPath() {
     return new File(
         String.format("%s/%s/%s/",
-            Environment.getExternalStorageDirectory().getPath(),
+            _sBasePath,
             _sAppName,
             "POICityMapSettings"
         )
