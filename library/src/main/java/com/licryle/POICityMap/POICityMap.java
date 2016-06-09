@@ -61,6 +61,7 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   protected POICityMapParser _mPOICityMapParser = null;
   protected POICityMapSettings _mSettings = null;
   protected int _iCityId = 0;
+  protected LatLng _mDefaultPosition = null;
 
 	public POICityMap(Activity mContext, POICityMapSettings mSettings,
                     POIQualifier mPOIQualifier,
@@ -88,6 +89,11 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
   public void onMapReady(GoogleMap mMap) {
     _mMap = mMap;
     _mMap.setInfoWindowAdapter(this);
+
+    if (getCameraPosition() != null) {
+      _mDefaultPosition = getCameraPosition().target;
+    }
+
     _setupMap();
     _dispatchOnMapReady();
   }
@@ -202,6 +208,14 @@ public class POICityMap implements OnMarkerClickListener, OnMapClickListener,
     if (!isMapLoaded()) return null;
 
     return _mMap.getCameraPosition();
+  }
+
+  public boolean wasPositionChanged() {
+    CameraPosition mPos = getCameraPosition();
+    if (mPos == null) return false;
+
+    return mPos.target.latitude != _mDefaultPosition.latitude
+        || mPos.target.longitude != _mDefaultPosition.longitude;
   }
 
   public void updateCamera(CameraUpdate mCameraUpdate) {
